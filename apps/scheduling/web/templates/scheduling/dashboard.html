@@ -1,0 +1,164 @@
+{% extends "scheduling/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard Gerencial</h1>
+
+<div class="stat-grid">
+    <div class="stat">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="num">{{ patients_count }}</div>
+        <div class="label">Pacientes</div>
+    </div>
+    <div class="stat">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <div class="num">{{ active_therapists_count }}</div>
+        <div class="label">Terapeutas Ativos</div>
+    </div>
+    <div class="stat">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+        </div>
+        <div class="num">{{ period_total }}</div>
+        <div class="label">Sessões (30 dias)</div>
+    </div>
+    <div class="stat">
+        <div class="stat-icon" style="background:var(--success-bg);color:var(--success);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+        </div>
+        <div class="num">{{ completion_rate }}%</div>
+        <div class="label">Taxa de Conclusão</div>
+    </div>
+    <div class="stat">
+        <div class="stat-icon" style="{% if cancellation_rate > 0 %}background:var(--danger-bg);color:var(--danger);{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+        </div>
+        <div class="num">{{ cancellation_rate }}%</div>
+        <div class="label">Taxa de Cancelamento</div>
+    </div>
+    <div class="stat">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        </div>
+        <div class="num">{{ active_goals_count }}</div>
+        <div class="label">Objetivos Ativos</div>
+    </div>
+    <div class="stat">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+        </div>
+        <div class="num">{{ records_last_30d }}</div>
+        <div class="label">Registros de Coleta (30 dias)</div>
+    </div>
+    <div class="stat">
+        <div class="stat-icon" style="{% if patients_without_anamnesis %}background:var(--warning-bg);color:var(--warning);{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+        </div>
+        <div class="num">{{ patients_without_anamnesis|length }}</div>
+        <div class="label">Anamneses Pendentes</div>
+    </div>
+</div>
+
+<div class="card" style="display:flex;gap:2rem;flex-wrap:wrap;">
+    <div style="flex:1;min-width:260px;">
+        <div class="card-head">
+            {% include "scheduling/components/section_header.html" with icon="list" title="Agendamentos por Status (30 dias)" %}
+        </div>
+        <canvas id="statusChart" height="220"></canvas>
+    </div>
+    <div style="flex:1;min-width:260px;">
+        <div class="card-head">
+            {% include "scheduling/components/section_header.html" with icon="briefcase" title="Sessões por Terapeuta (7 dias)" %}
+        </div>
+        {% if therapist_labels_json != "[]" %}
+        <canvas id="therapistChart" height="220"></canvas>
+        {% else %}
+        {% include "scheduling/components/empty_state.html" with icon="calendar" text="Nenhuma sessão agendada para os próximos 7 dias." %}
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="clock" title="Sessões de Hoje" %}
+    </div>
+    {% if today_appointments %}
+    <table>
+        <thead>
+            <tr><th>Paciente</th><th>Terapeuta</th><th>Horário</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for appointment in today_appointments %}
+            <tr>
+                <td>{{ appointment.patient.name }}</td>
+                <td>{{ appointment.therapist.name }}</td>
+                <td>{{ appointment.session_datetime|date:"H:i" }}</td>
+                <td><span class="badge badge-{{ appointment.status }}">{{ appointment.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    {% include "scheduling/components/empty_state.html" with icon="clock" text="Nenhuma sessão hoje." %}
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="alert" title="Pacientes Sem Anamnese" %}
+    </div>
+    {% if patients_without_anamnesis %}
+    <table>
+        <thead><tr><th>Paciente</th><th></th></tr></thead>
+        <tbody>
+            {% for patient in patients_without_anamnesis %}
+            <tr>
+                <td>{{ patient.name }}</td>
+                <td><a class="btn btn-secondary btn-sm" href="{% url 'scheduling:anamnesis_form' patient.pk %}">Preencher</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    {% include "scheduling/components/empty_state.html" with icon="file-text" text="Todos os pacientes têm anamnese preenchida." %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+<script>
+    new Chart(document.getElementById("statusChart"), {
+        type: "doughnut",
+        data: {
+            labels: {{ status_labels_json|safe }},
+            datasets: [{
+                data: {{ status_values_json|safe }},
+                backgroundColor: {{ status_colors_json|safe }},
+            }],
+        },
+        options: { plugins: { legend: { position: "bottom" } } },
+    });
+
+    {% if therapist_labels_json != "[]" %}
+    new Chart(document.getElementById("therapistChart"), {
+        type: "bar",
+        data: {
+            labels: {{ therapist_labels_json|safe }},
+            datasets: [{
+                label: "Sessões",
+                data: {{ therapist_values_json|safe }},
+                backgroundColor: "#0d9488",
+            }],
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+        },
+    });
+    {% endif %}
+</script>
+{% endblock %}

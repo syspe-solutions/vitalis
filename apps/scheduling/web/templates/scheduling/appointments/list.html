@@ -19,7 +19,7 @@
     #calendar-wrap { margin-bottom: 1.5rem; }
 </style>
 
-<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+<div class="card-head">
     <h1>Agendamento</h1>
     <button class="btn" id="btn-new-appointment">Novo Agendamento</button>
 </div>
@@ -29,7 +29,9 @@
 </div>
 
 <div class="card">
-    <h1 style="font-size:1.15rem;">Todos os Agendamentos</h1>
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="list" title="Todos os Agendamentos" %}
+    </div>
     {% if appointments %}
     <table>
         <thead>
@@ -38,7 +40,7 @@
         <tbody>
             {% for appointment in appointments %}
             <tr>
-                <td>{{ appointment.patient.name }}</td>
+                <td><span class="name-cell">{% include "scheduling/components/avatar.html" with name=appointment.patient.name %}{{ appointment.patient.name }}</span></td>
                 <td>{{ appointment.therapist.name }}</td>
                 <td>{{ appointment.session_datetime|date:"d/m/Y H:i" }}</td>
                 <td><span class="badge badge-{{ appointment.status }}">{{ appointment.get_status_display }}</span></td>
@@ -47,7 +49,7 @@
         </tbody>
     </table>
     {% else %}
-    <p class="empty">Nenhum agendamento realizado ainda.</p>
+    {% include "scheduling/components/empty_state.html" with icon="calendar" text="Nenhum agendamento realizado ainda." %}
     {% endif %}
 </div>
 

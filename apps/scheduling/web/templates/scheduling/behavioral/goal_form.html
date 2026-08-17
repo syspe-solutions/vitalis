@@ -1,0 +1,29 @@
+{% extends "scheduling/base.html" %}
+{% block title %}Novo Objetivo Comportamental{% endblock %}
+{% block content %}
+<h1>Novo Objetivo Comportamental</h1>
+<p class="empty" style="margin-top:-0.5rem;">Paciente: {{ patient.name }}</p>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <label for="title">Objetivo/Comportamento-Alvo</label>
+        <input type="text" id="title" name="title" value="{{ title|default:'' }}" placeholder="Ex.: Contato visual ao ser chamado pelo nome" required>
+
+        <label for="description">Descrição/Operacionalização</label>
+        <textarea id="description" name="description" rows="3">{{ description|default:'' }}</textarea>
+
+        <label for="measurement_type">Tipo de Medida</label>
+        <select id="measurement_type" name="measurement_type" required>
+            <option value="">Selecione</option>
+            {% for value, label in measurement_types %}
+            <option value="{{ value }}" {% if measurement_type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <p></p>
+        <button class="btn" type="submit">Salvar</button>
+        <a class="btn btn-secondary" href="{% url 'scheduling:patient_detail' patient.pk %}">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

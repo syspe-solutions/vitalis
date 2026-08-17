@@ -28,6 +28,7 @@ class PatientDetailView(View):
         return render(request, "scheduling/patients/detail.html", {
             "patient": patient,
             "can_manage": _can_manage(request),
+            "can_view_clinical": request.user.is_authenticated,
         })
 
 

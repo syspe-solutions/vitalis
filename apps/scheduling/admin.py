@@ -3,7 +3,14 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 
 from apps.common.admin import BaseModelAdminAbstract
-from apps.scheduling.models import Appointment, Patient, Therapist
+from apps.scheduling.models import (
+    Anamnesis,
+    Appointment,
+    BehavioralGoal,
+    BehavioralRecord,
+    Patient,
+    Therapist,
+)
 
 
 @admin.register(Patient)
@@ -101,3 +108,33 @@ class AppointmentAdmin(BaseModelAdminAbstract):
     def mark_as_completed(self, request, queryset):
         updated = queryset.update(status=Appointment.Status.COMPLETED, updated_by=request.user)
         self.message_user(request, f"{updated} agendamento(s) concluído(s).")
+
+
+@admin.register(Anamnesis)
+class AnamnesisAdmin(BaseModelAdminAbstract):
+    list_display = ("patient", "diagnosis", "responsible_name", "updated_at")
+    search_fields = ("patient__name", "diagnosis", "responsible_name")
+    autocomplete_fields = ("patient",)
+    readonly_fields = ("created_at", "created_by", "updated_at", "updated_by")
+
+
+@admin.register(BehavioralGoal)
+class BehavioralGoalAdmin(BaseModelAdminAbstract):
+    list_display = ("title", "patient", "measurement_type", "is_active")
+    list_filter = ("measurement_type", "is_active")
+    search_fields = ("title", "patient__name")
+    autocomplete_fields = ("patient",)
+    readonly_fields = ("created_at", "created_by", "updated_at", "updated_by")
+
+
+@admin.register(BehavioralRecord)
+class BehavioralRecordAdmin(BaseModelAdminAbstract):
+    list_display = ("goal", "appointment", "value_display", "created_at")
+    list_filter = ("goal__measurement_type",)
+    search_fields = ("goal__title", "appointment__patient__name")
+    autocomplete_fields = ("appointment", "goal")
+    readonly_fields = ("created_at", "created_by", "updated_at", "updated_by")
+
+    @admin.display(description="Valor")
+    def value_display(self, obj):
+        return obj.display_value

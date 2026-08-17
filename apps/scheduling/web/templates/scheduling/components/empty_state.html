@@ -1,0 +1,5 @@
+<div class="empty-state">
+    <span class="empty-state-icon">{% include "scheduling/components/icon.html" with name=icon %}</span>
+    <p>{{ text }}</p>
+    {% if cta_url %}<a class="btn btn-sm" href="{{ cta_url }}">{{ cta_label }}</a>{% endif %}
+</div>

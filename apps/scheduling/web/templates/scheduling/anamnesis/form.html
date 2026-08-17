@@ -1,0 +1,96 @@
+{% extends "scheduling/base.html" %}
+{% block title %}Anamnese — {{ patient.name }}{% endblock %}
+{% block content %}
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+    <h1>Anamnese — {{ patient.name }}</h1>
+    <a class="btn btn-secondary" href="{% url 'scheduling:patient_detail' patient.pk %}">Voltar</a>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="card">
+        <h1 style="font-size:1.05rem;">Responsável</h1>
+        <label for="responsible_name">Nome do Responsável *</label>
+        <input type="text" id="responsible_name" name="responsible_name" value="{{ responsible_name|default:'' }}" required>
+
+        <label for="responsible_relationship">Parentesco *</label>
+        <input type="text" id="responsible_relationship" name="responsible_relationship" value="{{ responsible_relationship|default:'' }}" required>
+
+        <label for="responsible_phone">Telefone</label>
+        <input type="text" id="responsible_phone" name="responsible_phone" value="{{ responsible_phone|default:'' }}">
+    </div>
+
+    <div class="card">
+        <h1 style="font-size:1.05rem;">Diagnóstico</h1>
+        <label for="chief_complaint">Queixa Principal / Motivo da Procura *</label>
+        <textarea id="chief_complaint" name="chief_complaint" rows="3" required>{{ chief_complaint|default:'' }}</textarea>
+
+        <label for="diagnosis">Diagnóstico</label>
+        <input type="text" id="diagnosis" name="diagnosis" value="{{ diagnosis|default:'' }}" placeholder="Ex.: TEA Nível 2 (CID F84.0)">
+
+        <label for="diagnosis_date">Data do Diagnóstico</label>
+        <input type="date" id="diagnosis_date" name="diagnosis_date" value="{{ diagnosis_date|default:'' }}">
+
+        <label for="diagnosing_professional">Profissional/Instituição que Diagnosticou</label>
+        <input type="text" id="diagnosing_professional" name="diagnosing_professional" value="{{ diagnosing_professional|default:'' }}">
+    </div>
+
+    <div class="card">
+        <h1 style="font-size:1.05rem;">Histórico</h1>
+        <label for="medical_history">Histórico Médico (gestação, parto, saúde geral)</label>
+        <textarea id="medical_history" name="medical_history" rows="3">{{ medical_history|default:'' }}</textarea>
+
+        <label for="family_history">Histórico Familiar</label>
+        <textarea id="family_history" name="family_history" rows="2">{{ family_history|default:'' }}</textarea>
+
+        <label for="developmental_milestones">Marcos do Desenvolvimento (motor, fala, social)</label>
+        <textarea id="developmental_milestones" name="developmental_milestones" rows="3">{{ developmental_milestones|default:'' }}</textarea>
+    </div>
+
+    <div class="card">
+        <h1 style="font-size:1.05rem;">Perfil Funcional</h1>
+        <label for="communication_profile">Comunicação (verbal, não-verbal, uso de CAA)</label>
+        <textarea id="communication_profile" name="communication_profile" rows="2">{{ communication_profile|default:'' }}</textarea>
+
+        <label for="sensory_profile">Perfil Sensorial</label>
+        <textarea id="sensory_profile" name="sensory_profile" rows="2">{{ sensory_profile|default:'' }}</textarea>
+
+        <label for="behaviors_of_concern">Comportamentos de Interesse Clínico</label>
+        <textarea id="behaviors_of_concern" name="behaviors_of_concern" rows="2">{{ behaviors_of_concern|default:'' }}</textarea>
+    </div>
+
+    <div class="card">
+        <h1 style="font-size:1.05rem;">Rotina</h1>
+        <label for="feeding_notes">Alimentação</label>
+        <textarea id="feeding_notes" name="feeding_notes" rows="2">{{ feeding_notes|default:'' }}</textarea>
+
+        <label for="sleep_notes">Sono</label>
+        <textarea id="sleep_notes" name="sleep_notes" rows="2">{{ sleep_notes|default:'' }}</textarea>
+
+        <label for="current_medications">Medicações em Uso</label>
+        <textarea id="current_medications" name="current_medications" rows="2">{{ current_medications|default:'' }}</textarea>
+    </div>
+
+    <div class="card">
+        <h1 style="font-size:1.05rem;">Contexto</h1>
+        <label for="previous_therapies">Terapias Anteriores/Atuais</label>
+        <textarea id="previous_therapies" name="previous_therapies" rows="2">{{ previous_therapies|default:'' }}</textarea>
+
+        <label for="school_info">Informações Escolares</label>
+        <textarea id="school_info" name="school_info" rows="2">{{ school_info|default:'' }}</textarea>
+    </div>
+
+    <div class="card">
+        <h1 style="font-size:1.05rem;">Expectativas</h1>
+        <label for="family_expectations">Expectativas da Família</label>
+        <textarea id="family_expectations" name="family_expectations" rows="2">{{ family_expectations|default:'' }}</textarea>
+
+        <label for="additional_notes">Observações Gerais</label>
+        <textarea id="additional_notes" name="additional_notes" rows="2">{{ additional_notes|default:'' }}</textarea>
+    </div>
+
+    <button class="btn" type="submit">Salvar Anamnese</button>
+    <a class="btn btn-secondary" href="{% url 'scheduling:patient_detail' patient.pk %}">Cancelar</a>
+</form>
+{% endblock %}

@@ -5,21 +5,32 @@
 
 <div class="stat-grid">
     <div class="stat">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
         <div class="num">{{ patients_count }}</div>
         <div class="label">Pacientes</div>
     </div>
     <div class="stat">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
         <div class="num">{{ therapists_count }}</div>
         <div class="label">Terapeutas</div>
     </div>
     <div class="stat">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+        </div>
         <div class="num">{{ upcoming_appointments|length }}</div>
         <div class="label">Próximas sessões</div>
     </div>
 </div>
 
 <div class="card">
-    <h1>Próximos agendamentos</h1>
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="calendar" title="Próximos agendamentos" %}
+    </div>
     {% if upcoming_appointments %}
     <table>
         <thead>
@@ -28,7 +39,7 @@
         <tbody>
             {% for appointment in upcoming_appointments %}
             <tr>
-                <td>{{ appointment.patient.name }}</td>
+                <td><span class="name-cell">{% include "scheduling/components/avatar.html" with name=appointment.patient.name %}{{ appointment.patient.name }}</span></td>
                 <td>{{ appointment.therapist.name }}</td>
                 <td>{{ appointment.session_datetime|date:"d/m/Y H:i" }}</td>
                 <td><span class="badge badge-{{ appointment.status }}">{{ appointment.get_status_display }}</span></td>
@@ -37,7 +48,7 @@
         </tbody>
     </table>
     {% else %}
-    <p class="empty">Nenhum agendamento futuro.</p>
+    {% include "scheduling/components/empty_state.html" with icon="calendar" text="Nenhum agendamento futuro." %}
     {% endif %}
 </div>
 

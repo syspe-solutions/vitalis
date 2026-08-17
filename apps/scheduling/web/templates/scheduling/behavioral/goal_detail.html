@@ -1,0 +1,120 @@
+{% extends "scheduling/base.html" %}
+{% block title %}{{ goal.title }}{% endblock %}
+{% block content %}
+<div class="card-head">
+    <h1>{{ goal.title }}</h1>
+    <a class="btn btn-secondary" href="{% url 'scheduling:patient_detail' goal.patient.pk %}">Voltar ao paciente</a>
+</div>
+
+<div class="card">
+    <div class="detail-row"><span class="k">Paciente</span><span class="v">{{ goal.patient.name }}</span></div>
+    <div class="detail-row"><span class="k">Tipo de Medida</span><span class="v">{{ goal.get_measurement_type_display }}</span></div>
+    <div class="detail-row"><span class="k">Descrição</span><span class="v">{{ goal.description|default:"—" }}</span></div>
+    <div class="detail-row"><span class="k">Status</span><span class="v">{% if goal.is_active %}Ativo{% else %}Inativo{% endif %}</span></div>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="trending-up" title="Gráfico de Progresso" %}
+    </div>
+    {% if chart_labels_json != "[]" %}
+    <canvas id="progressChart" height="90"></canvas>
+    {% else %}
+    {% include "scheduling/components/empty_state.html" with icon="trending-up" text="Ainda não há registros suficientes para gerar o gráfico." %}
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="plus-circle" title="Registrar Coleta" %}
+    </div>
+    {% if appointments %}
+    <form method="post" action="{% url 'scheduling:behavioral_record_create' goal.pk %}">
+        {% csrf_token %}
+        <label for="appointment">Sessão</label>
+        <select id="appointment" name="appointment" required>
+            <option value="">Selecione a sessão</option>
+            {% for appointment in appointments %}
+            <option value="{{ appointment.id }}">{{ appointment.session_datetime|date:"d/m/Y H:i" }} — {{ appointment.therapist.name }}</option>
+            {% endfor %}
+        </select>
+
+        {% if goal.measurement_type == "PERCENTAGE" %}
+        <label for="trials_correct">Acertos</label>
+        <input type="number" id="trials_correct" name="trials_correct" min="0" required>
+
+        <label for="trials_total">Total de Tentativas</label>
+        <input type="number" id="trials_total" name="trials_total" min="1" required>
+        {% else %}
+        <label for="value">
+            Valor
+            {% if goal.measurement_type == "DURATION" %}(minutos)
+            {% elif goal.measurement_type == "INTENSITY" %}(1 a 5)
+            {% endif %}
+        </label>
+        <input type="text" id="value" name="value" required>
+        {% endif %}
+
+        <label for="notes">Observações</label>
+        <textarea id="notes" name="notes" rows="2"></textarea>
+
+        <p></p>
+        <button class="btn" type="submit">Salvar Registro</button>
+    </form>
+    {% else %}
+    {% url 'scheduling:appointment_create' as appointment_create_url %}
+    {% include "scheduling/components/empty_state.html" with icon="calendar" text="Nenhuma sessão agendada para este paciente ainda." cta_url=appointment_create_url cta_label="Agendar sessão" %}
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="clock" title="Histórico" %}
+    </div>
+    {% if records %}
+    <table>
+        <thead>
+            <tr><th>Sessão</th><th>Valor</th><th>Observações</th></tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.appointment.session_datetime|date:"d/m/Y H:i" }}</td>
+                <td>{{ record.display_value }}</td>
+                <td>{{ record.notes|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    {% include "scheduling/components/empty_state.html" with icon="clock" text="Nenhum registro de coleta ainda." %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if chart_labels_json != "[]" %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+<script>
+    new Chart(document.getElementById("progressChart"), {
+        type: "line",
+        data: {
+            labels: {{ chart_labels_json|safe }},
+            datasets: [{
+                label: "{{ chart_axis_label }}",
+                data: {{ chart_values_json|safe }},
+                borderColor: "#0d9488",
+                backgroundColor: "rgba(13, 148, 136, 0.12)",
+                tension: 0.25,
+                fill: true,
+                pointRadius: 4,
+            }],
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } },
+        },
+    });
+</script>
+{% endif %}
+{% endblock %}

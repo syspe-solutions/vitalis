@@ -1,7 +1,7 @@
 {% extends "scheduling/base.html" %}
 {% block title %}{{ patient.name }}{% endblock %}
 {% block content %}
-<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+<div class="card-head">
     <h1>{{ patient.name }}</h1>
     <div class="actions-cell">
         <a class="btn btn-secondary" href="{% url 'scheduling:patient_list' %}">Voltar</a>
@@ -20,7 +20,9 @@
 </div>
 
 <div class="card">
-    <h1 style="font-size:1.15rem;">Agendamentos</h1>
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="calendar" title="Agendamentos" %}
+    </div>
     {% if patient.appointments.all %}
     <table>
         <thead>
@@ -37,7 +39,66 @@
         </tbody>
     </table>
     {% else %}
-    <p class="empty">Nenhum agendamento para este paciente.</p>
+    {% include "scheduling/components/empty_state.html" with icon="calendar" text="Nenhum agendamento para este paciente." %}
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="file-text" title="Anamnese" %}
+        {% if can_view_clinical %}
+        <a class="btn btn-secondary btn-sm" href="{% url 'scheduling:anamnesis_form' patient.pk %}">
+            {% if patient.anamnesis %}Editar{% else %}Preencher{% endif %} Anamnese
+        </a>
+        {% endif %}
+    </div>
+    {% if patient.anamnesis %}
+    <div class="detail-row"><span class="k">Responsável</span><span class="v">{{ patient.anamnesis.responsible_name }} ({{ patient.anamnesis.responsible_relationship }})</span></div>
+    <div class="detail-row"><span class="k">Diagnóstico</span><span class="v">{{ patient.anamnesis.diagnosis|default:"—" }}</span></div>
+    <div class="detail-row"><span class="k">Queixa Principal</span><span class="v">{{ patient.anamnesis.chief_complaint|truncatewords:20 }}</span></div>
+    {% elif can_view_clinical %}
+    {% include "scheduling/components/empty_state.html" with icon="file-text" text="Anamnese ainda não preenchida." %}
+    {% else %}
+    <p class="empty">Faça login para ver a anamnese.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="target" title="Objetivos Comportamentais" %}
+        {% if can_view_clinical %}
+        <a class="btn btn-secondary btn-sm" href="{% url 'scheduling:behavioral_goal_create' patient.pk %}">Novo Objetivo</a>
+        {% endif %}
+    </div>
+    {% if can_view_clinical %}
+        {% if patient.behavioral_goals.all %}
+        <table>
+            <thead>
+                <tr><th>Objetivo</th><th>Medida</th><th>Status</th><th>Registros</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for goal in patient.behavioral_goals.all %}
+                <tr>
+                    <td>{{ goal.title }}</td>
+                    <td>{{ goal.get_measurement_type_display }}</td>
+                    <td>
+                        {% if goal.is_active %}
+                        <span class="badge badge-SCHEDULED">Ativo</span>
+                        {% else %}
+                        <span class="badge badge-CANCELED">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ goal.records.count }}</td>
+                    <td><a class="btn btn-secondary btn-sm" href="{% url 'scheduling:behavioral_goal_detail' goal.pk %}">Ver coleta</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        {% include "scheduling/components/empty_state.html" with icon="target" text="Nenhum objetivo comportamental cadastrado." %}
+        {% endif %}
+    {% else %}
+    <p class="empty">Faça login para ver os objetivos comportamentais.</p>
     {% endif %}
 </div>
 {% endblock %}

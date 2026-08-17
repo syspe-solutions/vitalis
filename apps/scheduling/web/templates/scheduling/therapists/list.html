@@ -1,28 +1,36 @@
 {% extends "scheduling/base.html" %}
 {% block title %}Terapeutas{% endblock %}
 {% block content %}
-<h1>Terapeutas</h1>
+<div class="card-head">
+    <h1>Terapeutas</h1>
+    <a class="btn" href="{% url 'scheduling:therapist_create' %}">Cadastrar Terapeuta</a>
+</div>
 
 <div class="card">
     {% if therapists %}
     <table>
         <thead>
-            <tr><th>Nome</th><th>Email</th><th>Ativo</th></tr>
+            <tr><th>Nome</th><th>Email</th><th>Status</th></tr>
         </thead>
         <tbody>
             {% for therapist in therapists %}
             <tr>
-                <td>{{ therapist.name }}</td>
+                <td><span class="name-cell">{% include "scheduling/components/avatar.html" with name=therapist.name %}{{ therapist.name }}</span></td>
                 <td>{{ therapist.email }}</td>
-                <td>{% if therapist.is_active %}Sim{% else %}Não{% endif %}</td>
+                <td>
+                    {% if therapist.is_active %}
+                    <span class="badge badge-SCHEDULED">Ativo</span>
+                    {% else %}
+                    <span class="badge badge-CANCELED">Inativo</span>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     {% else %}
-    <p class="empty">Nenhum terapeuta cadastrado ainda.</p>
+    {% url 'scheduling:therapist_create' as therapist_create_url %}
+    {% include "scheduling/components/empty_state.html" with icon="briefcase" text="Nenhum terapeuta cadastrado ainda." cta_url=therapist_create_url cta_label="Cadastrar terapeuta" %}
     {% endif %}
 </div>
-
-<a class="btn" href="{% url 'scheduling:therapist_create' %}">Cadastrar Terapeuta</a>
 {% endblock %}
