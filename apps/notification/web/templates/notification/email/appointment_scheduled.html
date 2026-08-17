@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agendamento Confirmado</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
+
+          <tr>
+            <td style="background:linear-gradient(135deg,#0f766e 0%,#0d9488 100%);padding:32px;text-align:center;">
+              <span style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">Vitalis</span>
+              <p style="margin:8px 0 0;font-size:13px;color:#ccfbf1;letter-spacing:0.5px;text-transform:uppercase;">Agendamento de Sessões</p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:36px 40px 0;text-align:center;">
+              <div style="display:inline-block;background-color:#f0fdfa;border-radius:50%;width:64px;height:64px;line-height:64px;font-size:28px;margin-bottom:20px;">📅</div>
+              <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#0f172a;">{{ heading }}</h1>
+              <p style="margin:0;font-size:15px;color:#64748b;line-height:1.6;">
+                {% if notification.recipient_name %}Olá, <strong style="color:#0f766e;">{{ notification.recipient_name }}</strong>!{% endif %}
+                {{ intro_text }}
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:28px 40px 0;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
+                <tr>
+                  <td style="background-color:#0f766e;padding:10px 20px;">
+                    <span style="font-size:11px;font-weight:700;color:#ccfbf1;text-transform:uppercase;letter-spacing:1px;">Detalhes da Sessão</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding:8px 0;border-bottom:1px solid #e2e8f0;">
+                          <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="width:140px;font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;vertical-align:middle;">Paciente</td>
+                              <td style="font-size:14px;font-weight:600;color:#0f172a;vertical-align:middle;">{{ patient_name }}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;border-bottom:1px solid #e2e8f0;">
+                          <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="width:140px;font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;vertical-align:middle;">Terapeuta</td>
+                              <td style="font-size:14px;font-weight:600;color:#0f172a;vertical-align:middle;">{{ therapist_name }}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;{% if notes %}border-bottom:1px solid #e2e8f0;{% endif %}">
+                          <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="width:140px;font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;vertical-align:middle;">Data e Horário</td>
+                              <td style="font-size:14px;font-weight:600;color:#0f172a;vertical-align:middle;">{{ session_fmt }}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      {% if notes %}
+                      <tr>
+                        <td style="padding:8px 0;">
+                          <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="width:140px;font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">Observações</td>
+                              <td style="font-size:14px;color:#374151;vertical-align:top;">{{ notes }}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      {% endif %}
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:32px 40px 32px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#94a3b8;">
+                Este é um e-mail automático do Vitalis — por favor, não responda.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

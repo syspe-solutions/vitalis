@@ -1,0 +1,41 @@
+{% extends "scheduling/base.html" %}
+{% block title %}Novo Agendamento{% endblock %}
+{% block content %}
+<h1>Novo Agendamento</h1>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <label for="patient">Paciente</label>
+        <select id="patient" name="patient" required>
+            <option value="">Selecione um paciente</option>
+            {% for patient in patients %}
+            <option value="{{ patient.id }}">{{ patient.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="therapist">Terapeuta</label>
+        <select id="therapist" name="therapist" required>
+            <option value="">Selecione um terapeuta</option>
+            {% for therapist in therapists %}
+            <option value="{{ therapist.id }}">{{ therapist.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="session_datetime">Data e Horário da Sessão</label>
+        <input type="datetime-local" id="session_datetime" name="session_datetime" required>
+
+        <label for="notes">Observações</label>
+        <textarea id="notes" name="notes" rows="3"></textarea>
+
+        <p></p>
+        <button class="btn" type="submit">Agendar</button>
+    </form>
+    {% if not patients %}
+    <p class="empty" style="margin-top:1rem;">Nenhum paciente cadastrado. <a href="{% url 'scheduling:patient_create' %}">Cadastre um paciente</a> primeiro.</p>
+    {% endif %}
+    {% if not therapists %}
+    <p class="empty">Nenhum terapeuta cadastrado. <a href="{% url 'scheduling:therapist_create' %}">Cadastre um terapeuta</a> primeiro.</p>
+    {% endif %}
+</div>
+{% endblock %}

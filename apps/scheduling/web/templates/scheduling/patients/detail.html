@@ -1,0 +1,43 @@
+{% extends "scheduling/base.html" %}
+{% block title %}{{ patient.name }}{% endblock %}
+{% block content %}
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+    <h1>{{ patient.name }}</h1>
+    <div class="actions-cell">
+        <a class="btn btn-secondary" href="{% url 'scheduling:patient_list' %}">Voltar</a>
+        {% if can_manage %}
+        <a class="btn btn-secondary" href="{% url 'scheduling:patient_update' patient.pk %}">Editar</a>
+        <a class="btn btn-danger" href="{% url 'scheduling:patient_delete' patient.pk %}">Excluir</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="detail-row"><span class="k">Nome</span><span class="v">{{ patient.name }}</span></div>
+    <div class="detail-row"><span class="k">Email</span><span class="v">{{ patient.email }}</span></div>
+    <div class="detail-row"><span class="k">Data de Nascimento</span><span class="v">{{ patient.birth_date|date:"d/m/Y" }}</span></div>
+    <div class="detail-row"><span class="k">Cadastrado em</span><span class="v">{{ patient.created_at|date:"d/m/Y H:i" }}</span></div>
+</div>
+
+<div class="card">
+    <h1 style="font-size:1.15rem;">Agendamentos</h1>
+    {% if patient.appointments.all %}
+    <table>
+        <thead>
+            <tr><th>Terapeuta</th><th>Data e Hora</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for appointment in patient.appointments.all %}
+            <tr>
+                <td>{{ appointment.therapist.name }}</td>
+                <td>{{ appointment.session_datetime|date:"d/m/Y H:i" }}</td>
+                <td><span class="badge badge-{{ appointment.status }}">{{ appointment.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Nenhum agendamento para este paciente.</p>
+    {% endif %}
+</div>
+{% endblock %}

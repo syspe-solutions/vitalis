@@ -1,0 +1,20 @@
+{% extends "scheduling/base.html" %}
+{% block title %}Excluir Paciente{% endblock %}
+{% block content %}
+<h1>Excluir Paciente</h1>
+
+<div class="card">
+    <p>Tem certeza que deseja excluir <strong>{{ patient.name }}</strong>?</p>
+    {% with appt_count=patient.appointments.count %}
+    {% if appt_count %}
+    <p class="empty">Este paciente tem {{ appt_count }} agendamento{{ appt_count|pluralize }} — ele{{ appt_count|pluralize:",s" }} também ser{{ appt_count|pluralize:"á,ão" }} excluído{{ appt_count|pluralize }} junto.</p>
+    {% endif %}
+    {% endwith %}
+
+    <form method="post" style="margin-top:1rem;">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit">Confirmar Exclusão</button>
+        <a class="btn btn-secondary" href="{% url 'scheduling:patient_detail' patient.pk %}">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

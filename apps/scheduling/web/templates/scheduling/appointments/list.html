@@ -1,0 +1,211 @@
+{% extends "scheduling/base.html" %}
+{% block title %}Agendamentos{% endblock %}
+
+{% block content %}
+<style>
+    .fc { font-size: 0.85rem; }
+    .fc .fc-toolbar-title { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .fc .fc-button-primary {
+        background: #fff; color: var(--text); border-color: var(--border);
+        box-shadow: none !important;
+    }
+    .fc .fc-button-primary:hover { background: #f1f5f9; }
+    .fc .fc-button-primary:not(:disabled).fc-button-active,
+    .fc .fc-button-primary:not(:disabled):active {
+        background: var(--primary); border-color: var(--primary); color: #fff;
+    }
+    .fc .fc-day-today { background: #f0fdfa !important; }
+    .fc-event { cursor: pointer; border: none; }
+    #calendar-wrap { margin-bottom: 1.5rem; }
+</style>
+
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+    <h1>Agendamento</h1>
+    <button class="btn" id="btn-new-appointment">Novo Agendamento</button>
+</div>
+
+<div class="card" id="calendar-wrap">
+    <div id="calendar"></div>
+</div>
+
+<div class="card">
+    <h1 style="font-size:1.15rem;">Todos os Agendamentos</h1>
+    {% if appointments %}
+    <table>
+        <thead>
+            <tr><th>Paciente</th><th>Terapeuta</th><th>Data e Hora</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td>{{ appointment.patient.name }}</td>
+                <td>{{ appointment.therapist.name }}</td>
+                <td>{{ appointment.session_datetime|date:"d/m/Y H:i" }}</td>
+                <td><span class="badge badge-{{ appointment.status }}">{{ appointment.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Nenhum agendamento realizado ainda.</p>
+    {% endif %}
+</div>
+
+{% if not can_manage %}
+<p class="empty">Entre como superusuário (<a href="/admin/login/?next={{ request.path }}">login</a>) para editar, remarcar ou cancelar agendamentos. Remarcação e edição completas ficam no <a href="/admin/">painel administrativo</a>.</p>
+{% endif %}
+
+<!-- Modal: Novo Agendamento -->
+<div class="modal-overlay" id="modal-create">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Novo Agendamento</h2>
+            <button class="modal-close" data-close="modal-create">&times;</button>
+        </div>
+        <form method="post" action="{% url 'scheduling:appointment_create' %}">
+            {% csrf_token %}
+            <div class="modal-body">
+                <label for="modal-patient">Paciente</label>
+                <select id="modal-patient" name="patient" required>
+                    <option value="">Selecione um paciente</option>
+                    {% for patient in patients %}
+                    <option value="{{ patient.id }}">{{ patient.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="modal-therapist">Terapeuta</label>
+                <select id="modal-therapist" name="therapist" required>
+                    <option value="">Selecione um terapeuta</option>
+                    {% for therapist in therapists %}
+                    <option value="{{ therapist.id }}">{{ therapist.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="modal-session-datetime">Data e Horário da Sessão</label>
+                <input type="datetime-local" id="modal-session-datetime" name="session_datetime" required>
+
+                <label for="modal-notes">Observações</label>
+                <textarea id="modal-notes" name="notes" rows="3"></textarea>
+
+                {% if not patients %}
+                <p class="empty" style="margin-top:0.75rem;">Nenhum paciente cadastrado. <a href="{% url 'scheduling:patient_create' %}">Cadastre um paciente</a> primeiro.</p>
+                {% endif %}
+                {% if not therapists %}
+                <p class="empty">Nenhum terapeuta cadastrado. <a href="{% url 'scheduling:therapist_create' %}">Cadastre um terapeuta</a> primeiro.</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close="modal-create">Cancelar</button>
+                <button type="submit" class="btn">Agendar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Detalhe do Agendamento -->
+<div class="modal-overlay" id="modal-detail">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2 id="detail-title">Agendamento</h2>
+            <button class="modal-close" data-close="modal-detail">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-row"><span class="k">Paciente</span><span class="v" id="detail-patient">—</span></div>
+            <div class="detail-row"><span class="k">Terapeuta</span><span class="v" id="detail-therapist">—</span></div>
+            <div class="detail-row"><span class="k">Data e Hora</span><span class="v" id="detail-start">—</span></div>
+            <div class="detail-row"><span class="k">Status</span><span class="v" id="detail-status">—</span></div>
+            <div class="detail-row"><span class="k">Observações</span><span class="v" id="detail-notes">—</span></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-close="modal-detail">Fechar</button>
+            {% if can_manage %}
+            <form id="form-cancel-appointment" method="post" action="#" onsubmit="return confirm('Confirmar o cancelamento deste agendamento?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" id="btn-cancel-appointment">Cancelar Agendamento</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/locales/pt-br.global.min.js"></script>
+<script>
+    window.appointmentsFromBackend = {{ events_json|safe }};
+
+    const modalCreate = document.getElementById("modal-create");
+    const modalDetail = document.getElementById("modal-detail");
+
+    function openModal(el) { el.classList.add("open"); }
+    function closeModal(el) { el.classList.remove("open"); }
+
+    document.querySelectorAll("[data-close]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            closeModal(document.getElementById(btn.dataset.close));
+        });
+    });
+    [modalCreate, modalDetail].forEach(function (overlay) {
+        overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) closeModal(overlay);
+        });
+    });
+
+    document.getElementById("btn-new-appointment").addEventListener("click", function () {
+        openModal(modalCreate);
+    });
+
+    function fmtDatetime(iso) {
+        if (!iso) return "—";
+        return new Date(iso).toLocaleString("pt-BR", {
+            day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
+        });
+    }
+
+    function openDetailModal(info) {
+        const p = info.event.extendedProps;
+        document.getElementById("detail-title").textContent = p.patient;
+        document.getElementById("detail-patient").textContent = p.patient;
+        document.getElementById("detail-therapist").textContent = p.therapist;
+        document.getElementById("detail-start").textContent = fmtDatetime(info.event.startStr);
+        document.getElementById("detail-status").textContent = p.status_label;
+        document.getElementById("detail-notes").textContent = p.notes;
+
+        const cancelForm = document.getElementById("form-cancel-appointment");
+        if (cancelForm) {
+            cancelForm.action = "/agendamentos/" + p.appointment_id + "/cancelar/";
+            document.getElementById("btn-cancel-appointment").classList.toggle("hidden", p.status === "CANCELED");
+        }
+
+        openModal(modalDetail);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const calendarEl = document.getElementById("calendar");
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: "pt-br",
+            initialView: "timeGridWeek",
+            headerToolbar: {
+                left: "prev,next today",
+                center: "title",
+                right: "dayGridMonth,timeGridWeek,timeGridDay",
+            },
+            buttonText: { today: "Hoje", month: "Mês", week: "Semana", day: "Dia" },
+            height: "auto",
+            slotMinTime: "07:00:00",
+            slotMaxTime: "20:00:00",
+            allDaySlot: false,
+            nowIndicator: true,
+            eventTimeFormat: { hour: "2-digit", minute: "2-digit", hour12: false },
+            events: window.appointmentsFromBackend,
+            eventClick: function (info) { openDetailModal(info); },
+            dateClick: function (info) {
+                document.getElementById("modal-session-datetime").value = info.dateStr.length > 10 ? info.dateStr.slice(0, 16) : info.dateStr + "T09:00";
+                openModal(modalCreate);
+            },
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

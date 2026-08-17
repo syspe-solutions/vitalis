@@ -1,0 +1,47 @@
+{% extends "scheduling/base.html" %}
+{% block title %}Início{% endblock %}
+{% block content %}
+<h1>Painel de Agendamento</h1>
+
+<div class="stat-grid">
+    <div class="stat">
+        <div class="num">{{ patients_count }}</div>
+        <div class="label">Pacientes</div>
+    </div>
+    <div class="stat">
+        <div class="num">{{ therapists_count }}</div>
+        <div class="label">Terapeutas</div>
+    </div>
+    <div class="stat">
+        <div class="num">{{ upcoming_appointments|length }}</div>
+        <div class="label">Próximas sessões</div>
+    </div>
+</div>
+
+<div class="card">
+    <h1>Próximos agendamentos</h1>
+    {% if upcoming_appointments %}
+    <table>
+        <thead>
+            <tr><th>Paciente</th><th>Terapeuta</th><th>Data e Hora</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for appointment in upcoming_appointments %}
+            <tr>
+                <td>{{ appointment.patient.name }}</td>
+                <td>{{ appointment.therapist.name }}</td>
+                <td>{{ appointment.session_datetime|date:"d/m/Y H:i" }}</td>
+                <td><span class="badge badge-{{ appointment.status }}">{{ appointment.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Nenhum agendamento futuro.</p>
+    {% endif %}
+</div>
+
+<a class="btn" href="{% url 'scheduling:patient_create' %}">Cadastrar Paciente</a>
+<a class="btn" href="{% url 'scheduling:therapist_create' %}">Cadastrar Terapeuta</a>
+<a class="btn" href="{% url 'scheduling:appointment_create' %}">Novo Agendamento</a>
+{% endblock %}

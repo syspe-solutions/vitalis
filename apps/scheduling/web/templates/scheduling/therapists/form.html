@@ -1,0 +1,25 @@
+{% extends "scheduling/base.html" %}
+{% block title %}Cadastrar Terapeuta{% endblock %}
+{% block content %}
+<h1>Cadastrar Terapeuta</h1>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <label for="name">Nome</label>
+        <input type="text" id="name" name="name" value="{{ name|default:'' }}" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ email|default:'' }}" required>
+
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="password_confirm">Confirmar Senha</label>
+        <input type="password" id="password_confirm" name="password_confirm" required>
+
+        <p></p>
+        <button class="btn" type="submit">Salvar</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "scheduling/base.html" %}
+{% block title %}Terapeutas{% endblock %}
+{% block content %}
+<h1>Terapeutas</h1>
+
+<div class="card">
+    {% if therapists %}
+    <table>
+        <thead>
+            <tr><th>Nome</th><th>Email</th><th>Ativo</th></tr>
+        </thead>
+        <tbody>
+            {% for therapist in therapists %}
+            <tr>
+                <td>{{ therapist.name }}</td>
+                <td>{{ therapist.email }}</td>
+                <td>{% if therapist.is_active %}Sim{% else %}Não{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Nenhum terapeuta cadastrado ainda.</p>
+    {% endif %}
+</div>
+
+<a class="btn" href="{% url 'scheduling:therapist_create' %}">Cadastrar Terapeuta</a>
+{% endblock %}
