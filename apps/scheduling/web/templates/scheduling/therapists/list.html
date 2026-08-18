@@ -8,6 +8,7 @@
 
 <div class="card">
     {% if therapists %}
+    <div class="table-scroll">
     <table>
         <thead>
             <tr><th>Nome</th><th>Email</th><th>Status</th></tr>
@@ -28,6 +29,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     {% url 'scheduling:therapist_create' as therapist_create_url %}
     {% include "scheduling/components/empty_state.html" with icon="briefcase" text="Nenhum terapeuta cadastrado ainda." cta_url=therapist_create_url cta_label="Cadastrar terapeuta" %}

@@ -17,6 +17,13 @@
     .fc .fc-day-today { background: #f0fdfa !important; }
     .fc-event { cursor: pointer; border: none; }
     #calendar-wrap { margin-bottom: 1.5rem; }
+
+    @media (max-width: 640px) {
+        .fc { font-size: 0.72rem; }
+        .fc .fc-toolbar { flex-direction: column; gap: .5rem; align-items: stretch; }
+        .fc .fc-toolbar-title { font-size: .95rem; text-align: center; }
+        .fc .fc-button { padding: .3rem .5rem; }
+    }
 </style>
 
 <div class="card-head">
@@ -33,6 +40,7 @@
         {% include "scheduling/components/section_header.html" with icon="list" title="Todos os Agendamentos" %}
     </div>
     {% if appointments %}
+    <div class="table-scroll">
     <table>
         <thead>
             <tr><th>Paciente</th><th>Terapeuta</th><th>Data e Hora</th><th>Status</th></tr>
@@ -48,6 +56,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     {% include "scheduling/components/empty_state.html" with icon="calendar" text="Nenhum agendamento realizado ainda." %}
     {% endif %}
@@ -185,9 +194,11 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         const calendarEl = document.getElementById("calendar");
+        const isMobile = () => window.innerWidth < 640;
+
         const calendar = new FullCalendar.Calendar(calendarEl, {
             locale: "pt-br",
-            initialView: "timeGridWeek",
+            initialView: isMobile() ? "timeGridDay" : "timeGridWeek",
             headerToolbar: {
                 left: "prev,next today",
                 center: "title",
@@ -205,6 +216,12 @@
             dateClick: function (info) {
                 document.getElementById("modal-session-datetime").value = info.dateStr.length > 10 ? info.dateStr.slice(0, 16) : info.dateStr + "T09:00";
                 openModal(modalCreate);
+            },
+            windowResize: function () {
+                const wantsDay = isMobile();
+                const currentView = calendar.view.type;
+                if (wantsDay && currentView === "timeGridWeek") calendar.changeView("timeGridDay");
+                else if (!wantsDay && currentView === "timeGridDay") calendar.changeView("timeGridWeek");
             },
         });
         calendar.render();

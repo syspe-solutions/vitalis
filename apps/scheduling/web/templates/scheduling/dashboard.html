@@ -86,6 +86,7 @@
         {% include "scheduling/components/section_header.html" with icon="clock" title="Sessões de Hoje" %}
     </div>
     {% if today_appointments %}
+    <div class="table-scroll">
     <table>
         <thead>
             <tr><th>Paciente</th><th>Terapeuta</th><th>Horário</th><th>Status</th></tr>
@@ -101,6 +102,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     {% include "scheduling/components/empty_state.html" with icon="clock" text="Nenhuma sessão hoje." %}
     {% endif %}
@@ -111,6 +113,7 @@
         {% include "scheduling/components/section_header.html" with icon="alert" title="Pacientes Sem Anamnese" %}
     </div>
     {% if patients_without_anamnesis %}
+    <div class="table-scroll">
     <table>
         <thead><tr><th>Paciente</th><th></th></tr></thead>
         <tbody>
@@ -122,6 +125,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     {% include "scheduling/components/empty_state.html" with icon="file-text" text="Todos os pacientes têm anamnese preenchida." %}
     {% endif %}

@@ -160,15 +160,41 @@
                 position: static;
                 width: 100%;
                 flex-direction: row;
+                flex-wrap: wrap;
                 align-items: center;
-                padding: .75rem 1rem;
+                padding: .6rem .75rem;
+                row-gap: .5rem;
             }
-            .sidebar .brand { margin: 0 1rem 0 0; }
-            .sidebar nav { flex-direction: row; flex-wrap: wrap; flex: 1; gap: .25rem; }
+            .sidebar .brand { margin: 0 .75rem 0 0; }
+            .sidebar nav { flex-direction: row; flex-wrap: wrap; flex: 1; gap: .2rem; }
+            .sidebar nav a { padding: .5rem .55rem; }
             .sidebar nav a span { display: none; }
-            .sidebar .user-box { border-top: none; border-left: 1px solid rgba(255,255,255,.18); padding: 0 0 0 1rem; margin: 0; }
+            .sidebar .user-box { border-top: none; border-left: 1px solid rgba(255,255,255,.18); padding: 0 0 0 .75rem; margin: 0; }
             .sidebar .user-box .user-meta { display: none; }
             .page-wrap { margin-left: 0; }
+
+            main { margin: 1.25rem auto; padding: 0 1rem 2.5rem; }
+            .card { padding: 1.1rem; border-radius: var(--radius-md); }
+            h1 { font-size: 1.25rem; }
+
+            /* Tables: allow horizontal scroll instead of squeezing/breaking layout */
+            .table-scroll {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -1.1rem;
+                padding: 0 1.1rem;
+            }
+            .table-scroll table { min-width: 480px; }
+
+            .card-head { align-items: flex-start; }
+            .card-head .actions-cell, .card-head > a.btn, .card-head > button.btn { width: 100%; }
+            .modal-body { padding: 1.1rem; }
+        }
+
+        @media (max-width: 420px) {
+            .sidebar .brand-name { display: none; }
+            .sidebar nav a span { display: none; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         /* ── Layout ──────────────────────────────────────── */

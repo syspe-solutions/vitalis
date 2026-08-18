@@ -32,6 +32,7 @@
         {% include "scheduling/components/section_header.html" with icon="calendar" title="Próximos agendamentos" %}
     </div>
     {% if upcoming_appointments %}
+    <div class="table-scroll">
     <table>
         <thead>
             <tr><th>Paciente</th><th>Terapeuta</th><th>Data e Hora</th><th>Status</th></tr>
@@ -47,6 +48,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     {% include "scheduling/components/empty_state.html" with icon="calendar" text="Nenhum agendamento futuro." %}
     {% endif %}

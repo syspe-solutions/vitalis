@@ -72,6 +72,7 @@
         {% include "scheduling/components/section_header.html" with icon="clock" title="Histórico" %}
     </div>
     {% if records %}
+    <div class="table-scroll">
     <table>
         <thead>
             <tr><th>Sessão</th><th>Valor</th><th>Observações</th></tr>
@@ -86,6 +87,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     {% include "scheduling/components/empty_state.html" with icon="clock" text="Nenhum registro de coleta ainda." %}
     {% endif %}

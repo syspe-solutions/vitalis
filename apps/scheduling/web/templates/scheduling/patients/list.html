@@ -8,6 +8,7 @@
 
 <div class="card">
     {% if patients %}
+    <div class="table-scroll">
     <table>
         <thead>
             <tr>
@@ -34,6 +35,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     {% url 'scheduling:patient_create' as patient_create_url %}
     {% include "scheduling/components/empty_state.html" with icon="users" text="Nenhum paciente cadastrado ainda." cta_url=patient_create_url cta_label="Cadastrar paciente" %}

@@ -24,6 +24,7 @@
         {% include "scheduling/components/section_header.html" with icon="calendar" title="Agendamentos" %}
     </div>
     {% if patient.appointments.all %}
+    <div class="table-scroll">
     <table>
         <thead>
             <tr><th>Terapeuta</th><th>Data e Hora</th><th>Status</th></tr>
@@ -38,6 +39,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     {% else %}
     {% include "scheduling/components/empty_state.html" with icon="calendar" text="Nenhum agendamento para este paciente." %}
     {% endif %}
@@ -72,6 +74,7 @@
     </div>
     {% if can_view_clinical %}
         {% if patient.behavioral_goals.all %}
+        <div class="table-scroll">
         <table>
             <thead>
                 <tr><th>Objetivo</th><th>Medida</th><th>Status</th><th>Registros</th><th></th></tr>
@@ -94,6 +97,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
         {% else %}
         {% include "scheduling/components/empty_state.html" with icon="target" text="Nenhum objetivo comportamental cadastrado." %}
         {% endif %}
