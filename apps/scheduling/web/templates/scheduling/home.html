@@ -54,7 +54,23 @@
     {% endif %}
 </div>
 
-<a class="btn" href="{% url 'scheduling:patient_create' %}">Cadastrar Paciente</a>
-<a class="btn" href="{% url 'scheduling:therapist_create' %}">Cadastrar Terapeuta</a>
-<a class="btn" href="{% url 'scheduling:appointment_create' %}">Novo Agendamento</a>
+<div class="card">
+    <div class="card-head">
+        {% include "scheduling/components/section_header.html" with icon="plus-circle" title="Ações rápidas" %}
+    </div>
+    <div class="quick-actions">
+        <a class="quick-action" href="{% url 'scheduling:patient_create' %}">
+            <span class="quick-action-icon">{% include "scheduling/components/icon.html" with name="users" %}</span>
+            Cadastrar Paciente
+        </a>
+        <a class="quick-action" href="{% url 'scheduling:therapist_create' %}">
+            <span class="quick-action-icon">{% include "scheduling/components/icon.html" with name="briefcase" %}</span>
+            Cadastrar Terapeuta
+        </a>
+        <a class="quick-action" href="{% url 'scheduling:appointment_create' %}">
+            <span class="quick-action-icon">{% include "scheduling/components/icon.html" with name="calendar" %}</span>
+            Novo Agendamento
+        </a>
+    </div>
+</div>
 {% endblock %}
