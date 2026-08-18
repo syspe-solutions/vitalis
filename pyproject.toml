@@ -9,6 +9,8 @@ requires-python = ">=3.13"
 dependencies = [
     "django>=5.1,<6.0",
     "python-dotenv>=1.0",
+    "gunicorn>=23.0",
+    "whitenoise>=6.7",
 ]
 
 [tool.uv]
